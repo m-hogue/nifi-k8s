@@ -39,6 +39,12 @@ spec:
           mountPath: /opt/nifi/nifi-current/logs
         - name: nifi-content-pv
           mountPath: /opt/nifi/nifi-current/content-repository
+        - name: nifi-flowfile-pv
+          mountPath: /opt/nifi/nifi-current/flowfile-repository
+        - name: nifi-db-pv
+          mountPath: /opt/nifi/nifi-current/database-repository
+        - name: nifi-provenance-pv
+          mountPath: /opt/nifi/nifi-current/provenance-repository
         ports:
         - containerPort: 8080
           name: http-port
@@ -54,6 +60,15 @@ spec:
       - name: nifi-content-pv
         persistentVolumeClaim: 
           claimName: nifi-content-pvc
+      - name: nifi-flowfile-pv
+        persistentVolumeClaim: 
+          claimName: nifi-flowfile-pvc
+      - name: nifi-db-pv
+        persistentVolumeClaim: 
+          claimName: nifi-db-pvc
+      - name: nifi-provenance-pv
+        persistentVolumeClaim: 
+          claimName: nifi-provenance-pvc
 ---
 # Logs persistent volume claim
 apiVersion: v1
@@ -74,6 +89,51 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: nifi-content-pvc
+  namespace: default
+spec:
+  accessModes:
+  - ReadWriteOnce
+  # This assumes you've deployed a rook-ceph cluster with a cephfs provisioner
+  storageClassName: csi-cephfs
+  resources:
+    requests:
+      storage: 10Gi      
+---
+# FlowFile repo persistent volume claim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nifi-flowfile-pvc
+  namespace: default
+spec:
+  accessModes:
+  - ReadWriteOnce
+  # This assumes you've deployed a rook-ceph cluster with a cephfs provisioner
+  storageClassName: csi-cephfs
+  resources:
+    requests:
+      storage: 10Gi      
+---
+# database repo persistent volume claim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nifi-db-pvc
+  namespace: default
+spec:
+  accessModes:
+  - ReadWriteOnce
+  # This assumes you've deployed a rook-ceph cluster with a cephfs provisioner
+  storageClassName: csi-cephfs
+  resources:
+    requests:
+      storage: 10Gi      
+---
+# provenance repo persistent volume claim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nifi-provenance-pvc
   namespace: default
 spec:
   accessModes:
