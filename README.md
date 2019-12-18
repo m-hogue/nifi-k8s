@@ -9,7 +9,10 @@ This guide assumes the following:
 These are the steps I followed to set this up:
 
 1. Install k3s since it bundles all of the necessary pieces to run Kubernetes, such as a container runtime (containerd) and ingress controller (traefik)
-2. Install Rancher's local-path-provisioner and deploy in k3s
+2. Download Rancher's local-path-provisioner and deploy in k3s
+
+    a. Instructions: https://github.com/rancher/local-path-provisioner  
+    b. By default, the local-path-provisioner writes all state to `/opt/local-path-provisioner`. If you don't want that, you can change it by pulling the yaml and editing the `config.json` at the bottom of the file.  
 3. deploy the nifi.yaml in this repo
 
     a. `kubectl create -f ./nifi-k8s/nifi.yaml`  
