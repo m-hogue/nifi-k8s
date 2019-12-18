@@ -1,0 +1,100 @@
+# NiFi Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: nifi-service
+spec:
+  ports:
+  - port: 8180
+    targetPort: 8080
+    name: http-port
+  - port: 8443
+    name: https-port
+  selector:
+    app: nifi
+  type: LoadBalancer 
+---
+# NiFi Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nifi
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nifi
+  template:
+    metadata:
+      labels:
+        app: nifi
+    spec: 
+      containers:
+      - name: nifi-container
+        image: "apache/nifi:1.10.0"
+        imagePullPolicy: Always
+        volumeMounts:
+        - name: nifi-logs-pv
+          mountPath: /opt/nifi/nifi-current/logs
+        - name: nifi-content-pv
+          mountPath: /opt/nifi/nifi-current/content-repository
+        ports:
+        - containerPort: 8080
+          name: http-port
+        - containerPort: 8443
+          name: https-port   
+        env:
+        - name: VERSION
+          value: "1.10"
+      volumes:
+      - name: nifi-logs-pv
+        persistentVolumeClaim: 
+          claimName: nifi-logs-pvc
+      - name: nifi-content-pv
+        persistentVolumeClaim: 
+          claimName: nifi-content-pvc
+---
+# Logs persistent volume claim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nifi-logs-pvc
+  namespace: default
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 10Gi
+---
+# content repo persistent volume claim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nifi-content-pvc
+  namespace: default
+spec:
+  accessModes:
+  - ReadWriteOnce
+  # This assumes you've deployed a rook-ceph cluster with a cephfs provisioner
+  storageClassName: csi-cephfs
+  resources:
+    requests:
+      storage: 10Gi      
+---
+# Ingress config
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: nifi-ingress
+spec:
+  rules:
+  - host: nifi
+    http:
+      paths:
+      - path: /nifi
+        backend:
+          serviceName: nifi-service
+          servicePort: 8180
