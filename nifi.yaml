@@ -8,8 +8,8 @@ spec:
   - port: 8180
     targetPort: 8080
     name: http-port
-  # - port: 8443
-  #   name: https-port
+  - port: 8443
+    name: https-port
   selector:
     app: nifi
   type: LoadBalancer 
@@ -45,8 +45,6 @@ spec:
         env:
         - name: VERSION
           value: "1.10"
-        - name: NIFI_ZK_CONNECT_STRING
-          value: "zk-0.zk-hs.default.svc.cluster.local:2181"       
       volumes:
       - name: nifi-pv
         persistentVolumeClaim: 
