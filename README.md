@@ -3,11 +3,11 @@ This is a really basic, quick and dirty nifi k8s deployment yaml and is very muc
 
 ## Setup
 This guide assumes the following:
-    - There is a persistent volume provisioner that supports the storage class "local-path" installed in k8s
-    - There is an ingress controller installed in k8s
+- There is a persistent volume provisioner that supports the storage class "local-path" installed in k8s
+- There is an ingress controller installed in k8s
 
 ### Known Issues:
-    - Using a local-path persistent volume forces any nifi running to use the same directory for state. This means running > 1 NiFi will be a problem. The intent is to use Rook long term for persistence. To get it working for now, just using local path provisioning.
+- Using a local-path persistent volume forces any nifi running to use the same directory for state. This means running > 1 NiFi will be a problem. The intent is to use Rook long term for persistence. To get it working for now, just using local path provisioning.
 
 These are the steps I followed to set this up:
 
