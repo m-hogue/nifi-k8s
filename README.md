@@ -15,7 +15,7 @@ These are the steps I followed to set this up:
 2. Install Rancher's local-path-provisioner and deploy in k3s
 3. deploy the nifi.yaml in this repo
 
-    a. kubectl create -f ./nifi-k8s/nifi.yaml  
+    a. `kubectl create -f ./nifi-k8s/nifi.yaml`  
     b. By default, traefik routes everything via port 80 and 443 for http and https, respectively. Nifi's ingress config specifies the host as `nifi`, so the URL to access the NiFi UI will be `http://nifi:80/nifi`
 
 
