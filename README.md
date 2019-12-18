@@ -26,3 +26,8 @@ These are the steps I followed to set this up:
 
     a. k3s will automatically redeploy traefik with the updated configuration. You can watch this happen via `watch kubectl get pods --all-namespaces`  
     b. You can find where the dashboard is running via `kubectl get endpoints -n kube-system`
+
+## TODO:
+1. Investigate alternate persistent volume provisioners. Possibly leverage a storage orchestrator such as Rook
+2. Depending on the persistent volume provisioning, may want to impement node affinity rules to have some sense of locality for volume mounts and running pods
+3. Deploy Apache NiFi Registry, split the graph into sub-graphs, and have k8s services hosting a sub-graph
