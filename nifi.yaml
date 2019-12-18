@@ -1,0 +1,83 @@
+# NiFi Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: nifi-service
+spec:
+  ports:
+  - port: 8180
+    targetPort: 8080
+    name: http-port
+  # - port: 8443
+  #   name: https-port
+  selector:
+    app: nifi
+  type: LoadBalancer 
+---
+# NiFi Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nifi
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nifi
+  template:
+    metadata:
+      labels:
+        app: nifi
+    spec: 
+      containers:
+      - name: nifi-container
+        image: "apache/nifi:1.10.0"
+        imagePullPolicy: Always
+        volumeMounts:
+        - name: nifi-pv
+          mountPath: /opt/nifi/nifi-current/logs
+        ports:
+        - containerPort: 8080
+          name: http-port
+        - containerPort: 8443
+          name: https-port   
+        env:
+        - name: VERSION
+          value: "1.10"
+        - name: NIFI_ZK_CONNECT_STRING
+          value: "zk-0.zk-hs.default.svc.cluster.local:2181"       
+      volumes:
+      - name: nifi-pv
+        persistentVolumeClaim: 
+          claimName: nifi-pvc
+
+---
+# Local persistent volume claim (currently just local path)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nifi-pvc
+  namespace: default
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 10Gi
+---
+# Ingress config
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: nifi-ingress
+spec:
+  rules:
+  - host: nifi
+    http:
+      paths:
+      - path: /nifi
+        backend:
+          serviceName: nifi-service
+          servicePort: 8180
