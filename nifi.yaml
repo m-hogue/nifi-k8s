@@ -29,7 +29,9 @@ spec:
     metadata:
       labels:
         app: nifi
-    spec: 
+      annotations:
+        prometheus.io/port: '9092'
+    spec:
       containers:
       - name: nifi-container
         image: "apache/nifi:1.10.0"
@@ -42,6 +44,8 @@ spec:
           name: http-port
         - containerPort: 8443
           name: https-port   
+        - containerPort: 9092
+          name: metrics-port
         env:
         - name: VERSION
           value: "1.10"
