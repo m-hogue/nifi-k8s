@@ -1,0 +1,74 @@
+# Registry Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: docker-registry
+  namespace: default
+spec:
+  ports:
+    - port: 5000
+      targetPort: http-port
+      name: http-port
+  selector:
+    app: docker-registry
+  type: LoadBalancer
+---
+# docker-registry Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: docker-registry
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: docker-registry
+  template:
+    metadata:
+      labels:
+        app: docker-registry
+    spec:
+      containers:
+      - name: docker-registry-container
+        image: "registry:latest"
+        imagePullPolicy: Always
+        volumeMounts:
+        - name: docker-registry-pv
+          mountPath: /var/lib/registry
+        ports:
+        - containerPort: 5000
+          name: http-port
+      volumes:
+      - name: docker-registry-pv
+        persistentVolumeClaim:
+          claimName: docker-registry-pvc
+---
+# Ingress config
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: docker-registry-ingress
+spec:
+  rules:
+  - host: nifi
+    http:
+      paths:
+      - path: /docker-registry
+        backend:
+          serviceName: docker-registry
+          servicePort: 5000
+---
+# Local persistent volume claim (currently just local path)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: docker-registry-pvc
+  namespace: default
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 10Gi

@@ -1,0 +1,18 @@
+# Ingress config
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: nifi-ingress
+spec:
+  rules:
+    - host: nifi
+      http:
+        paths:
+        - path: /nifi-registry
+          backend:
+            serviceName: nifi-registry-service
+            servicePort: 18080
+        - path: /nifi
+          backend:
+            serviceName: nifi-service
+            servicePort: 8180

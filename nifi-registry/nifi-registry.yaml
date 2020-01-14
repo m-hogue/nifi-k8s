@@ -1,0 +1,59 @@
+# NiFi Registry Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: nifi-registry-service
+spec:
+  ports:
+  - port: 18080
+    name: http-port
+  selector:
+    app: nifi-registry
+  type: LoadBalancer
+---
+# NiFi Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nifi-registry
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nifi-registry
+  template:
+    metadata:
+      labels:
+        app: nifi-registry
+    spec:
+      containers:
+        - name: nifi-registry-container
+          image: "apache/nifi-registry:0.5.0"
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: nifi-registry-pv
+              mountPath: /opt/nifi/nifi-registry/nifi-registry-current
+          ports:
+            - containerPort: 18080
+              name: http-port
+            - containerPort: 18443
+              name: https-port
+      volumes:
+        - name: nifi-registry-pv
+          persistentVolumeClaim:
+            claimName: nifi-registry-pvc
+---
+# Local persistent volume claim (currently just local path)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nifi-registry-pvc
+  namespace: default
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 10Gi

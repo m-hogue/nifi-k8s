@@ -1,59 +1,46 @@
-# NiFi Service
-apiVersion: v1
-kind: Service
-metadata:
-  name: nifi-service
-spec:
-  ports:
-  - port: 8180
-    targetPort: 8080
-    name: http-port
-  - port: 8443
-    name: https-port
-  selector:
-    app: nifi
-  type: LoadBalancer 
----
 # NiFi Deployment
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
-  name: nifi
+  name: nifi-parasite
   namespace: default
 spec:
   replicas: 1
+  serviceName: nifi-parasite
   selector:
     matchLabels:
-      app: nifi
+      app: nifi-parasite
   template:
     metadata:
       labels:
-        app: nifi
+        app: nifi-parasite 
     spec: 
       containers:
-      - name: nifi-container
-        image: "apache/nifi:1.10.0"
+      - name: nifi-parasite-container
+        image: "nifi:5000/parasite/latest"
         imagePullPolicy: Always
         volumeMounts:
         - name: nifi-pv
-          mountPath: /opt/nifi/nifi-current/logs
-        - name: nifi-pv
-          mountPath: /opt/nifi/nifi-current/share
+          mountPath: /share
+        - name: test-volume
+          mountPath: /template
         ports:
         - containerPort: 8080
           name: http-port
         - containerPort: 8443
           name: https-port
         env:
-        - name: VERSION
-          value: "1.10"
         - name: BASE_DIR_SUFFIX
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
       volumes:
       - name: nifi-pv
-        persistentVolumeClaim: 
+        persistentVolumeClaim:
           claimName: nifi-pvc
----
-
+      - name: test-volume
+        hostPath:
+          # directory location on host
+          path: /stuff/local-path-provisioner/template
+          # this field is optional
+          type: Directory
