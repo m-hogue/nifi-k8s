@@ -1,6 +1,25 @@
 # nifi-k8s
 This is a really basic, quick and dirty nifi k8s deployment yaml and is very much a work in progress.
 
+## Components
+### Docker Registry
+This is an independent Docker Registry used to host images for the k8s Cluster. This is advantageous for hosting either _only_ images you need for this k8s cluster or for images you wish to keep private to your cluster and not be posted in a public Docker Registry.
+
+### Nifi Registry
+The k8s configuration to deploy a single NiFi Registry. This is used to stage changes to the NiFi canvas and deploy them to production.
+
+### Parasite
+Parasite is a nickname for single node NiFi instances. These will host processor groups deployed via the NiFi Registry. The expectation is that there will be a large variety of parasite groups (ingest, conversion, enrichment, etc.). This is the k8s configuration for parasites.
+
+### Prometheus
+The k8s configuration to deploy prometheus and grafana, which are scraping metrics from all of the other components.
+
+### NiFi
+The `nifi.yaml` and `nifi-rook-ceph.yaml` are k8s configurations for a driver NiFi that would be hosted in a staging environment, for example. 
+
+### NiFi Operator (TODO)
+This currently absent component will be responsible for detecting staged changes in the NiFi Registry, provisioning parasites satisfying those changes if necessary, and deploying the changes to the production k8s cluster.
+
 ## Setup
 This guide assumes the following:
 - There is a persistent volume provisioner that supports the storage class "local-path" installed in k8s
