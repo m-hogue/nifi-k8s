@@ -1,7 +1,7 @@
 # nifi-k8s
 This is a really basic, quick and dirty nifi k8s deployment yaml and is very much a work in progress.
 
-## Components
+# Components
 ### Docker Registry
 This is an independent Docker Registry used to host images for the k8s Cluster. This is advantageous for hosting either _only_ images you need for this k8s cluster or for images you wish to keep private to your cluster and not be posted in a public Docker Registry.
 
@@ -20,7 +20,7 @@ The `nifi.yaml` and `nifi-rook-ceph.yaml` are k8s configurations for a driver Ni
 ### NiFi Operator (TODO)
 This currently absent component will be responsible for all command & control of the NiFi component. At a high level, it will detect staged changes in the NiFi Registry, provision parasites satisfying those changes if necessary, and deploy the changes to the production k8s cluster.
 
-## Setup
+# Setup
 This guide assumes the following:
 - There is a persistent volume provisioner that supports the storage class "local-path" installed in k8s
 - There is an ingress controller installed in k8s
@@ -47,6 +47,6 @@ These are the steps I followed to set this up:
     a. k3s will automatically redeploy traefik with the updated configuration. You can watch this happen via `watch kubectl get pods --all-namespaces`  
     b. You can find where the dashboard is running via `kubectl get endpoints -n kube-system`
 
-## TODO:
+# TODO:
 1. Depending on the persistent volume provisioning, may want to impement node affinity rules to have some sense of locality for volume mounts and running pods
 2. Being implementing Operator to orchestrate nifi deployments
