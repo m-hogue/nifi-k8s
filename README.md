@@ -18,7 +18,7 @@ The k8s configuration to deploy prometheus and grafana, which are scraping metri
 The `nifi.yaml` and `nifi-rook-ceph.yaml` are k8s configurations for a driver NiFi that would be hosted in a staging environment, for example. 
 
 ### NiFi Operator (TODO)
-This currently absent component will be responsible for detecting staged changes in the NiFi Registry, provisioning parasites satisfying those changes if necessary, and deploying the changes to the production k8s cluster.
+This currently absent component will be responsible for all command & control of the NiFi component. At a high level, it will detect staged changes in the NiFi Registry, provision parasites satisfying those changes if necessary, and deploy the changes to the production k8s cluster.
 
 ## Setup
 This guide assumes the following:
@@ -48,6 +48,5 @@ These are the steps I followed to set this up:
     b. You can find where the dashboard is running via `kubectl get endpoints -n kube-system`
 
 ## TODO:
-1. Investigate alternate persistent volume provisioners. Possibly leverage a storage orchestrator such as Rook
-2. Depending on the persistent volume provisioning, may want to impement node affinity rules to have some sense of locality for volume mounts and running pods
-3. Deploy Apache NiFi Registry, split the graph into sub-graphs, and have k8s services hosting a sub-graph
+1. Depending on the persistent volume provisioning, may want to impement node affinity rules to have some sense of locality for volume mounts and running pods
+2. Being implementing Operator to orchestrate nifi deployments
